@@ -72,7 +72,3 @@ async def solve_captcha(file: UploadFile = File(...)):
         # Return an error if anything goes wrong
         return {"error": f"Error processing image: {str(e)}"}
 
-if __name__ == "__main__":
-    # This allows you to run the server by typing 'python api.py'
-    print("Starting server... (Use 'uvicorn api:app --reload' for development)")
-    uvicorn.run("api:app", host="127.0.0.1", port=5000, reload=False)
