@@ -4,11 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from PIL import Image
 
-# Import the specific function from your main.py
-# This assumes main.py is in the same directory
+
 try:
     # We need a function that takes image *bytes*
-    # Let's ensure your main.py has 'get_text_from_image_bytes'
+    # Let's ensure main.py has 'get_text_from_image_bytes'
     from main import get_text_from_image_bytes, initialize_model, model_file
 except ImportError:
     print("Error: Could not import from main.py.")
@@ -30,9 +29,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# This is a "startup" event.
-# It ensures the model is loaded once when the server starts,
-# not every time a request is made.
+
 @app.on_event("startup")
 def load_model():
     try:
@@ -42,8 +39,7 @@ def load_model():
         print(f"Model {model_file} loaded successfully on startup.")
     except Exception as e:
         print(f"Error loading model on startup: {e}")
-        # You might want to exit if the model can't load
-        # exit(1)
+        
 
 
 # Health check route
@@ -53,7 +49,7 @@ def read_root():
     return {"status": "healthy", "message": "Captcha solver API is running."}
 
 
-# This is your main API endpoint
+
 @app.post("/solve_captcha", summary="Solve Captcha from Image")
 async def solve_captcha(file: UploadFile = File(...)):
     """
@@ -67,7 +63,7 @@ async def solve_captcha(file: UploadFile = File(...)):
         
         # 2. Use your function from main.py to solve it
         predicted_text = get_text_from_image_bytes(image_bytes)
-        print(predicted_text)
+        
         
         # 3. Return the solution
         return {"text": predicted_text}
@@ -78,6 +74,5 @@ async def solve_captcha(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     # This allows you to run the server by typing 'python api.py'
-    # But the 'uvicorn' command is preferred for development.
     print("Starting server... (Use 'uvicorn api:app --reload' for development)")
     uvicorn.run("api:app", host="127.0.0.1", port=5000, reload=False)

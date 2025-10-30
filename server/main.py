@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import os
 
-# We assume tokenizer_base.py is in the same directory
+
 try:
     from tokenizer_base import Tokenizer
 except ImportError:
@@ -88,7 +88,6 @@ def get_text_from_image_object(img_obj: Image.Image):
     probs = torch.tensor(logits).softmax(-1)
     # We only need the predicted text (preds)
     preds, _ = tokenizer_base.decode(probs) 
-    print(f"Decoded predictions: {preds[0]}")
     return preds[0] # Return the first (and only) prediction
 
 def get_text_from_image_bytes(image_bytes: bytes):

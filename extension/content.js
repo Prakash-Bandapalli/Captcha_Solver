@@ -1,5 +1,3 @@
-console.log("e-Courts Captcha Solver: Script Injected (v5 - Observer+Canvas)");
-
 const API_URL = "http://127.0.0.1:5000/solve_captcha";
 const CAPTCHA_INPUT_ID = "captcha";
 const CAPTCHA_IMAGE_ID = "captcha_image";
@@ -11,6 +9,7 @@ let solving = false; // Flag to prevent multiple runs
  * @param {HTMLImageElement} imgElement The <img> tag on the page.
  * @returns {Promise<Blob>} A promise that resolves with the image data.
  */
+
 function getImageBlobFromCanvas(imgElement) {
   return new Promise((resolve, reject) => {
     try {
@@ -23,9 +22,7 @@ function getImageBlobFromCanvas(imgElement) {
 
       // 3. Draw the visible image onto the canvas
       const ctx = canvas.getContext("2d");
-      // This line is important: it prevents cross-origin errors
-      // We can't do this, but the image *should* be same-origin.
-      // imgElement.crossOrigin = "Anonymous";
+
       ctx.drawImage(imgElement, 0, 0);
 
       // 4. Get the image data from the canvas as a Blob
