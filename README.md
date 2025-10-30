@@ -1,4 +1,3 @@
-````markdown
 # e-Courts Captcha Solver
 
 This project is a complete full-stack solution to automatically solve and fill captchas on the e-Courts judgments website. It consists of a Python FastAPI backend that runs an ONNX machine learning model and a Chrome Extension frontend that interacts with the webpage.
@@ -89,4 +88,3 @@ This project has two parts: the **server** (backend) and the **extension** (fron
     `https://judgments.ecourts.gov.in/pdfsearch/index.php`
 
     The captcha will be solved and filled in automatically.
-````
