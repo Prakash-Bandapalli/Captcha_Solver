@@ -4,6 +4,12 @@ This project is a complete full-stack solution to automatically solve and fill c
 
 This was built as part of an internship assignment.
 
+## Demo
+
+https://github.com/user-attachments/assets/9c5a4799-2c74-4b22-86ea-df601e44e132
+
+*The extension automatically detects, solves, and fills the captcha in real-time.*
+
 ## Features
 
 * **Automated Solving:** Automatically detects and solves the captcha on page load.
