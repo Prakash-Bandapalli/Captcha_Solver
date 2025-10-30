@@ -23,21 +23,61 @@ The main challenge was handling how the website serves its captcha.
 
 ### Initial Approach (v1 - "Simple Fetch")
 
-The first version of the extension worked, but with a confusing side-effect.
+The first version of the extension worked, but with a confusing side-effect. The extension would `fetch()` the captcha URL, which was a *new* request to the server. This created a "visibly wrong" mismatch, where the text in the box (Answer B) did not match the image on the screen (Image A).
 
-* **How it worked:** The extension would `fetch()` the captcha URL. This was a *new* request to the server.
-* **The Result:** The server would generate a *new* image ("Image B") and update its session to expect that answer. The extension would solve "Image B" and fill the box.
-* **The Flaw (The Mismatch):** The user was still looking at the *original* image on the page ("Image A"). This created a "visibly wrong" mismatch, where the text in the box (Answer B) did not match the image on the screen (Image A). While it worked, it was a poor user experience.
+**Note:** While visually confusing, this method **still works** and successfully bypasses the captcha. This is because the server's session is updated by the `fetch` request to expect "Answer B", which is exactly what the extension provides.
+```mermaid
+flowchart TD
+    subgraph Browser
+        A[Browser loads page] --> B(Server sends Image A);
+        C[User sees Image A];
+    end
+
+    subgraph Extension
+        D[Extension `fetch`es URL] --> E(Server sends Image B);
+        E --> F[API Server solves Image B];
+        F --> G[Extension fills box with Answer B];
+    end
+
+    A --> D;
+    B --> C;
+    
+    subgraph Result
+        H(Mismatch: User sees Image A, but box has Answer B);
+    end
+
+    C --> H;
+    G --> H;
+```
 
 ### Final Approach (v2 - "Observer + Canvas")
 
-The final, robust version (v5 in our development, `content.js` in the repo) solves this mismatch.
+The final, robust version (`content.js` in the repo) solves this mismatch for a better user experience. It does **not** `fetch` a new image. Instead, it uses a `MutationObserver` (a "watchman") to wait for the *real* image to appear, and then uses a `<canvas>` (a "photocopier") to copy its pixels.
 
-* **How it works:** This version does **not** `fetch` a new image. Instead, it acts like a user:
-    1.  **Observe:** It uses a `MutationObserver` (a "watchman") to wait for the *real* captcha image to appear on the screen.
-    2.  **Copy:** It then uses a `<canvas>` (a "photocopier") to take a pixel-perfect copy of the image that is *currently visible* on the page.
-    3.  **Solve:** This copy is sent to the backend.
-* **The Result:** The text in the box now **perfectly matches** the image on the screen. This version also watches for the user to click "refresh," at which point it repeats the process.
+This way, the solved text always matches the visible image.
+```mermaid
+flowchart TD
+    subgraph Browser
+        A[Browser loads page] --> B(Server sends Image A);
+        C[User sees Image A];
+    end
+
+    subgraph Extension
+        D(Observer waits for Image A);
+        D --> E[Canvas copies Image A];
+        E --> F[API Server solves Image A];
+        F --> G[Extension fills box with Answer A];
+    end
+
+    B --> D;
+    
+    subgraph Result
+        H(Match! User sees Image A, and box has Answer A);
+    end
+
+    C --> H;
+    G --> H;
+```
 
 ## Setup and Installation
 
@@ -46,24 +86,24 @@ This project has two parts: the **server** (backend) and the **extension** (fron
 ### 1. Backend Server
 
 1.  Navigate to the `server/` directory:
-    ```bash
+```bash
     cd server
-    ```
+```
 2.  Create and activate a Python virtual environment:
-    ```bash
+```bash
     # Create the venv
     python -m venv venv
-    
+
     # Activate on Windows (Git Bash)
     source venv/Scripts/activate
-    
+
     # Or on Windows (CMD/PowerShell)
     .\venv\Scripts\activate
-    ```
+```
 3.  Install the required libraries:
-    ```bash
+```bash
     pip install -r requirements.txt
-    ```
+```
 
 ### 2. Frontend Extension
 
@@ -78,9 +118,10 @@ This project has two parts: the **server** (backend) and the **extension** (fron
 
 1.  **Start the Server:**
     Make sure your virtual environment is active in the `server/` directory, then run:
-    ```bash
+```bash
     uvicorn api:app --host 127.0.0.1 --port 5000
-    ```
+```
+
     Your server will be running at `http://127.0.0.1:5000`.
 
 2.  **Use the Extension:**
