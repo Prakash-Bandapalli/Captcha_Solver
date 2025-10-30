@@ -1,5 +1,3 @@
-Here is a clean `README.md` file for your project. You can copy the entire contents of the text block below and paste it into your `README.md` file.
-
 ````markdown
 # e-Courts Captcha Solver
 
