@@ -79,7 +79,7 @@ This project has two parts: the **server** (backend) and the **extension** (fron
 1.  **Start the Server:**
     Make sure your virtual environment is active in the `server/` directory, then run:
     ```bash
-    uvicorn api:app --reload
+    uvicorn api:app --host 127.0.0.1 --port 5000
     ```
     Your server will be running at `http://127.0.0.1:5000`.
 
