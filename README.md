@@ -1,5 +1,3 @@
-
-
 # e-Courts Captcha Solver
 
 This project is a complete full-stack solution to automatically solve and fill captchas on the e-Courts judgments website. It consists of a Python FastAPI backend that runs an ONNX machine learning model and a Chrome Extension frontend that interacts with the webpage.
@@ -45,7 +43,7 @@ flowchart LR
     F --> G[Extension fills Answer B]
     C --> H[Mismatch: Image A ≠ Answer B]
     G --> H
-```
+````
 
 ### Final Approach (v2 - "Observer + Canvas")
 
@@ -65,18 +63,35 @@ flowchart LR
     G --> H
 ```
 
+### Why v2? The Path to the Solution
+
+The v1 approach was confusing, so I tried several other methods to fix the visual mismatch. These attempts failed and proved *why* v2 is the only correct approach.
+
+  * **Attempt 1: The "Visual Fix"**
+
+      * **What I tried:** I used `fetch` to get "Image B" and then tried to force the `<img>` tag on the page to display it (using `objectURL` or `dataURL`).
+      * **Why it Failed:** The website's **Content Security Policy (CSP)** blocked this. The browser refused to load the new image, which broke the image element (showing "Catcha Text") and sent corrupt data to the backend.
+
+  * **Attempt 2: The "Fetch Check"**
+
+      * **What I tried:** I assumed the "Visual Fix" failed because the `fetch` was being blocked. I tried a cleaner `fetch` with error checking.
+      * **Why it Failed:** This proved the server is smart. It detected my script was a "bot" (not a real `<img>` tag) and intentionally sent back **invalid junk data** instead of an image.
+
+  * **The Solution (v2):**
+    This is why v2 (`Observer` + `Canvas`) is the only robust method. It doesn't try to trick the server. It waits for the browser to load the image normally, then "photocopies" it from the screen. The server cannot detect or block this, as it's just reading pixels that are already visible.
+
 ## Setup and Installation
 
 This project has two parts: the **server** (backend) and the **extension** (frontend).
 
-### 1. Backend Server
+### 1\. Backend Server
 
 1.  Navigate to the `server/` directory:
-```bash
+    ```bash
     cd server
-```
+    ```
 2.  Create and activate a Python virtual environment:
-```bash
+    ```bash
     # Create the venv
     python -m venv venv
 
@@ -85,13 +100,13 @@ This project has two parts: the **server** (backend) and the **extension** (fron
 
     # Or on Windows (CMD/PowerShell)
     .\venv\Scripts\activate
-```
+    ```
 3.  Install the required libraries:
-```bash
+    ```bash
     pip install -r requirements.txt
-```
+    ```
 
-### 2. Frontend Extension
+### 2\. Frontend Extension
 
 1.  Open the Google Chrome browser.
 2.  Go to the extensions page by typing `chrome://extensions` in the address bar.
@@ -104,9 +119,10 @@ This project has two parts: the **server** (backend) and the **extension** (fron
 
 1.  **Start the Server:**
     Make sure your virtual environment is active in the `server/` directory, then run:
-```bash
+
+    ```bash
     uvicorn api:app --host 127.0.0.1 --port 5000
-```
+    ```
 
     Your server will be running at `http://127.0.0.1:5000`.
 
@@ -115,3 +131,6 @@ This project has two parts: the **server** (backend) and the **extension** (fron
     `https://judgments.ecourts.gov.in/pdfsearch/index.php`
 
     The captcha will be solved and filled in automatically.
+
+```
+```
