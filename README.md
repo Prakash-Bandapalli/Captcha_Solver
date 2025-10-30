@@ -1,3 +1,5 @@
+
+
 # e-Courts Captcha Solver
 
 This project is a complete full-stack solution to automatically solve and fill captchas on the e-Courts judgments website. It consists of a Python FastAPI backend that runs an ONNX machine learning model and a Chrome Extension frontend that interacts with the webpage.
@@ -32,28 +34,17 @@ The main challenge was handling how the website serves its captcha.
 The first version of the extension worked, but with a confusing side-effect. The extension would `fetch()` the captcha URL, which was a *new* request to the server. This created a "visibly wrong" mismatch, where the text in the box (Answer B) did not match the image on the screen (Image A).
 
 **Note:** While visually confusing, this method **still works** and successfully bypasses the captcha. This is because the server's session is updated by the `fetch` request to expect "Answer B", which is exactly what the extension provides.
+
 ```mermaid
-flowchart TD
-    subgraph Browser
-        A[Browser loads page] --> B(Server sends Image A);
-        C[User sees Image A];
-    end
-
-    subgraph Extension
-        D[Extension `fetch`es URL] --> E(Server sends Image B);
-        E --> F[API Server solves Image B];
-        F --> G[Extension fills box with Answer B];
-    end
-
-    A --> D;
-    B --> C;
-    
-    subgraph Result
-        H(Mismatch: User sees Image A, but box has Answer B);
-    end
-
-    C --> H;
-    G --> H;
+flowchart LR
+    A[Browser loads page] --> B[Server sends Image A]
+    B --> C[User sees Image A]
+    A --> D[Extension fetches URL]
+    D --> E[Server sends Image B]
+    E --> F[API solves Image B]
+    F --> G[Extension fills Answer B]
+    C --> H[Mismatch: Image A ≠ Answer B]
+    G --> H
 ```
 
 ### Final Approach (v2 - "Observer + Canvas")
@@ -61,28 +52,17 @@ flowchart TD
 The final, robust version (`content.js` in the repo) solves this mismatch for a better user experience. It does **not** `fetch` a new image. Instead, it uses a `MutationObserver` (a "watchman") to wait for the *real* image to appear, and then uses a `<canvas>` (a "photocopier") to copy its pixels.
 
 This way, the solved text always matches the visible image.
+
 ```mermaid
-flowchart TD
-    subgraph Browser
-        A[Browser loads page] --> B(Server sends Image A);
-        C[User sees Image A];
-    end
-
-    subgraph Extension
-        D(Observer waits for Image A);
-        D --> E[Canvas copies Image A];
-        E --> F[API Server solves Image A];
-        F --> G[Extension fills box with Answer A];
-    end
-
-    B --> D;
-    
-    subgraph Result
-        H(Match! User sees Image A, and box has Answer A);
-    end
-
-    C --> H;
-    G --> H;
+flowchart LR
+    A[Browser loads page] --> B[Server sends Image A]
+    B --> C[User sees Image A]
+    B --> D[Observer detects Image A]
+    D --> E[Canvas copies Image A]
+    E --> F[API solves Image A]
+    F --> G[Extension fills Answer A]
+    C --> H[Match: Image A = Answer A]
+    G --> H
 ```
 
 ## Setup and Installation
